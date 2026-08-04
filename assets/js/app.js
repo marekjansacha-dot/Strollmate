@@ -225,7 +225,7 @@ function renderCartInForm() {
 
     div.innerHTML = `
       <h3 style="margin-bottom:6px;">${item.name}</h3>
-      <p style="margin-bottom:10px;">${item.price} zł / dzień</p>
+      <p style="margin-bottom:10px;">${item.price * days} zł / okres</p>
       <p style="margin-bottom:10px; color:#555;">Łącznie: <strong>${itemTotal.toFixed(2)} zł</strong></p>
       <button 
         class="remove-from-cart"
@@ -331,6 +331,7 @@ document.addEventListener("submit", async (e) => {
   },
   body: JSON.stringify(payload)
 });
+
 
 
     alert("Rezerwacja wysłana! Skontaktujemy się wkrótce.");
