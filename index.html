@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Strollmate – Wózki i foteliki z dostawą w Krakowie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script defer src="assets/js/app.js"></script>
+</head>
+
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <a href="index.html" class="logo">Strollmate</a>
+      </div>
+
+      <nav class="topbar-nav">
+        <a href="produkty.html">Produkty</a>
+        <a href="faq.html">FAQ</a>
+        <a href="regulamin.html">Regulamin</a>
+        <a href="kontakt.html">Kontakt</a>
+      </nav>
+
+      <div class="topbar-right">
+        <a href="rezerwacja.html" class="cart-link">Koszyk / <span id="cart-total">0,00 zł (0)</span></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- KATEGORIE -->
+  <section class="categories">
+    <div class="container categories-inner">
+      <a href="produkty.html#wozki">WÓZKI DZIECIĘCE</a>
+      <a href="produkty.html#foteliki">FOTELIKI SAMOCHODOWE</a>
+      <a href="produkty.html#lozeczka">ŁÓŻECZKA TURYSTYCZNE</a>
+      <a href="produkty.html#wagi">WAGI NIEMOWLĘCE</a>
+    </div>
+  </section>
+
+  <!-- FANCY HERO -->
+  <section class="fancy-hero">
+    <div class="container fancy-grid">
+
+      <div class="fancy-left">
+        <h1>Wózki i foteliki z dostawą w 2–3h w Krakowie</h1>
+        <p>Najbardziej elastyczna wypożyczalnia dla turystów i rodziców. Dostawa na lotnisko, do hotelu lub odbiór osobisty.</p>
+        <a href="produkty.html" class="btn-primary">Zobacz ofertę</a>
+      </div>
+
+      <div class="fancy-right">
+        <div class="fancy-card">
+
+          <h2>Wybierz termin wypożyczenia</h2>
+          <p>Terminy będą automatycznie użyte w koszyku i dostępności produktów.</p>
+
+          <label for="date-start" style="display:block; margin-top:10px; font-weight:600;">
+            Data odbioru:
+          </label>
+          <input 
+            type="date" 
+            id="date-start" 
+            style="padding:10px; width:100%; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;"
+          >
+
+          <label for="date-end" style="display:block; margin-top:10px; font-weight:600;">
+            Data zwrotu:
+          </label>
+          <input 
+            type="date" 
+            id="date-end" 
+            style="padding:10px; width:100%; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;"
+          >
+
+          <button 
+            id="apply-dates"
+            class="btn-primary"
+            style="margin-top:15px; width:100%;"
+          >
+            Zapisz termin
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- STEPS PREMIUM -->
+  <section class="steps-premium">
+    <div class="container">
+      <h2>Jak to działa?</h2>
+
+      <div class="steps-premium-grid">
+
+        <div class="step-premium">
+          <div class="step-icon">🚀</div>
+          <h3>1. Wybierz sprzęt</h3>
+          <p>Dodaj do koszyka i wybierz termin.</p>
+        </div>
+
+        <div class="step-premium">
+          <div class="step-icon">📦</div>
+          <h3>2. Dostawa w 2–3h</h3>
+          <p>Na lotnisko, do hotelu lub odbiór osobisty.</p>
+        </div>
+
+        <div class="step-premium">
+          <div class="step-icon">🔧</div>
+          <h3>3. Montaż fotelika</h3>
+          <p>Profesjonalny montaż ISOFIX na miejscu.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 Strollmate – wypożyczalnia wózków i fotelików.</p>
+      <p><a href="regulamin.html">Regulamin</a> · <a href="kontakt.html">Kontakt</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
+

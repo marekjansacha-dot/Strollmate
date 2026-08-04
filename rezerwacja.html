@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rezerwacja – Strollmate</title>
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script defer src="assets/js/app.js"></script>
+</head>
+
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <a href="index.html" class="logo">Strollmate</a>
+      </div>
+
+      <nav class="topbar-nav">
+        <a href="produkty.html">Produkty</a>
+        <a href="faq.html">FAQ</a>
+        <a href="regulamin.html">Regulamin</a>
+        <a href="kontakt.html">Kontakt</a>
+      </nav>
+
+      <div class="topbar-right">
+        <a href="rezerwacja.html" class="cart-link">Koszyk / <span id="cart-total">(0)</span></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- FORMULARZ PREMIUM -->
+  <section class="fancy-hero">
+    <div class="container">
+
+      <h1 style="margin-bottom: 20px;">Formularz rezerwacji</h1>
+      <p style="color:#555; margin-bottom: 30px;">Uzupełnij dane, wybierz termin i sposób dostawy. Po wysłaniu rezerwacji skontaktujemy się z Tobą w celu potwierdzenia.</p>
+
+      <div class="fancy-grid">
+
+        <!-- LEWA STRONA: FORMULARZ -->
+        <div class="fancy-left">
+
+          <form id="reservation-form" class="fancy-card" style="text-align:left;">
+
+  <!-- UKRYTE POLE NA KOSZYK -->
+  <input type="hidden" name="cart" id="cart-hidden">
+
+  <h2>Dane kontaktowe</h2>
+
+  <label>Imię i nazwisko</label>
+  <input 
+    type="text" 
+    name="name" 
+    id="name"
+    required 
+    style="width:100%; padding:10px; margin-bottom:15px;"
+  >
+
+  <label>Telefon</label>
+  <input 
+    type="text" 
+    name="phone" 
+    id="phone"
+    required 
+    style="width:100%; padding:10px; margin-bottom:15px;"
+  >
+
+  <label>Email</label>
+  <input 
+    type="email" 
+    name="email" 
+    id="email"
+    required 
+    style="width:100%; padding:10px; margin-bottom:25px;"
+  >
+
+
+  <h2>Termin wypożyczenia</h2>
+
+  <label>Data odbioru</label>
+  <input 
+    type="date" 
+    name="start" 
+    required 
+    style="width:100%; padding:10px; margin-bottom:15px;"
+  >
+
+  <label>Data zwrotu</label>
+  <input 
+    type="date" 
+    name="end" 
+    required 
+    style="width:100%; padding:10px; margin-bottom:25px;"
+  >
+
+
+  <h2>Sposób dostawy</h2>
+
+  <select 
+    name="delivery" 
+    required 
+    style="width:100%; padding:10px; margin-bottom:25px;"
+  >
+    <option value="odbior">Odbiór osobisty</option>
+    <option value="hotel">Dostawa do hotelu</option>
+    <option value="lotnisko">Dostawa na lotnisko Balice</option>
+    <option value="adres">Dostawa pod wskazany adres</option>
+  </select>
+
+  <label>Adres (jeśli dotyczy)</label>
+  <input 
+    type="text" 
+    name="address" 
+    placeholder="Ulica, nr, miasto" 
+    style="width:100%; padding:10px; margin-bottom:25px;"
+  >
+
+  <button 
+    type="submit" 
+    class="btn-primary" 
+    style="width:100%; padding:14px; font-size:1rem;"
+  >
+    Wyślij rezerwację
+  </button>
+
+</form>
+
+
+        </div>
+
+        <!-- PRAWA STRONA: PODSUMOWANIE KOSZYKA -->
+        <div class="fancy-right">
+          <div class="fancy-card" style="text-align:left;">
+            <h2>Twoje zamówienie</h2>
+            <p style="color:#555; margin-bottom:20px;">Lista produktów dodanych do koszyka:</p>
+
+            <div id="cart-items"></div>
+
+            <p id="cart-term-summary" style="margin-top:10px; color:#555;"></p>
+
+            <p style="margin-top:20px; font-size:1.2rem; font-weight:700;">
+              Razem: <span id="cart-total-summary">0,00 zł</span>
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 Strollmate – wypożyczalnia wózków i fotelików.</p>
+      <p><a href="regulamin.html">Regulamin</a> · <a href="kontakt.html">Kontakt</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
