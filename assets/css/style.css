@@ -328,3 +328,72 @@ section {
   font-weight: 500;
   border-radius: 8px;
 }
+
+/* -------------------------------------------------- */
+/* ⭐ SLIDER PRODUKTÓW — NOWE STYLE */
+/* -------------------------------------------------- */
+
+.product-slider {
+  margin-top: 60px;
+}
+
+.product-slider h2 {
+  margin-bottom: 20px;
+}
+
+.slider-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.slider-track {
+  display: flex;
+  gap: 20px;
+  transition: transform 0.3s ease;
+}
+
+.small-card {
+  min-width: calc(33.333% - 20px);
+  flex-shrink: 0;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  border: 1px solid #ddd;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.slider-btn-left {
+  left: -10px;
+}
+
+.slider-btn-right {
+  right: -10px;
+}
+
+.slider-btn:hover {
+  background: #f0f0f0;
+}
+
+@media (max-width: 768px) {
+  .small-card {
+    min-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .small-card {
+    min-width: 100%;
+  }
+}
