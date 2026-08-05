@@ -445,3 +445,36 @@ document.addEventListener("submit", async (e) => {
     window.location.href = "index.html";
   }
 });
+
+// -------------------------------
+// ⭐ SLIDER PRODUKTÓW — NOWA FUNKCJA
+// -------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+  const track = document.querySelector(".slider-track");
+  if (!track) return; // slider tylko na podstronach produktu
+
+  const btnLeft = document.querySelector(".slider-btn-left");
+  const btnRight = document.querySelector(".slider-btn-right");
+
+  let position = 0;
+
+  function getCardWidth() {
+    const card = track.querySelector(".small-card");
+    if (!card) return 300;
+    return card.offsetWidth + 20; // margines między kartami
+  }
+
+  btnRight.addEventListener("click", () => {
+    const cardWidth = getCardWidth();
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    position = Math.min(position + cardWidth, maxScroll);
+    track.style.transform = `translateX(-${position}px)`;
+  });
+
+  btnLeft.addEventListener("click", () => {
+    const cardWidth = getCardWidth();
+    position = Math.max(position - cardWidth, 0);
+    track.style.transform = `translateX(-${position}px)`;
+  });
+});
