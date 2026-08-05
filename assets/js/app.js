@@ -75,8 +75,9 @@ const availability = {
 // blokady z panelu admina (Google Sheets)
 let adminBlocks = [];
 
-// 🔥 PODSTAW SWÓJ URL WEB APP Z APPS SCRIPT
-const ADMIN_AVAILABILITY_URL = "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec";
+// 🔥 URL WEB APP Z APPS SCRIPT (availability_admin)
+const ADMIN_AVAILABILITY_URL =
+  "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec";
 
 async function fetchAdminAvailability() {
   try {
@@ -162,6 +163,9 @@ function isAvailable(productId, start, end) {
   return true;
 }
 
+// -------------------------------
+// WYSZARZANIE + OVERLAY NIEDZIELNY
+// -------------------------------
 
 function applyAvailability() {
   const { start, end } = getDates();
@@ -169,8 +173,16 @@ function applyAvailability() {
   document.querySelectorAll(".mosaic-card").forEach(card => {
     const productId = card.dataset.product;
     const addBtn = card.querySelector(".add-to-cart");
+    const img = card.querySelector(".product-image");
 
     const available = isAvailable(productId, start, end);
+
+    // Reset overlay przy każdej zmianie dat
+    if (img) {
+      img.classList.remove("sunday-overlay");
+      const oldOverlay = img.querySelector(".sunday-overlay-text");
+      if (oldOverlay) oldOverlay.remove();
+    }
 
     if (!available) {
       card.classList.add("unavailable");
@@ -180,6 +192,41 @@ function applyAvailability() {
         addBtn.classList.add("disabled");
         addBtn.style.pointerEvents = "none";
       }
+
+      // 🔥 LOGIKA OVERLAY NIEDZIELNEGO
+      const startDate = start ? new Date(start) : null;
+      const endDate = end ? new Date(end) : null;
+
+      const startDay = startDate ? startDate.getDay() : null;
+      const endDay = endDate ? endDate.getDay() : null;
+
+      const sundayStartBlocked = adminBlocks.some(b =>
+        b.product === "all" &&
+        b.type === "weekday_start" &&
+        b.weekday === "Sunday"
+      );
+
+      const sundayEndBlocked = adminBlocks.some(b =>
+        b.product === "all" &&
+        b.type === "weekday_end" &&
+        b.weekday === "Sunday"
+      );
+
+      const isSundayReason =
+        (startDay === 0 && sundayStartBlocked) ||
+        (endDay === 0 && sundayEndBlocked);
+
+      if (isSundayReason && img) {
+        img.classList.add("sunday-overlay");
+
+        img.insertAdjacentHTML("beforeend", `
+          <div class="sunday-overlay-text">
+            W niedzielę nie realizujemy odbiorów ani dostaw sprzętu.<br>
+            Prosimy o wybranie innego dnia.
+          </div>
+        `);
+      }
+
     } else {
       card.classList.remove("unavailable");
 
@@ -381,14 +428,17 @@ document.addEventListener("submit", async (e) => {
       totalPrice: total.toFixed(2)
     };
 
-    await fetch("https://script.google.com/macros/s/AKfycbxxpCDCDQqwQHRnXqdxDV8h-bVHbCSrsddqfqAhip57b37UvNPtK2QxTgKwKwAP9iQ/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbxxpCDCDQqwQHRnXqdxDV8h-bVHbCSrsddqfqAhip57b37UvNPtK2QxTgKwKwAP9iQ/exec",
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
 
     alert("Rezerwacja wysłana! Skontaktujemy się wkrótce.");
     localStorage.removeItem("cart");
