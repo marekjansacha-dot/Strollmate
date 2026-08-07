@@ -281,6 +281,24 @@ document.addEventListener("change", (e) => {
   }
 });
 
+// ⭐ POKAZYWANIE / UKRYWANIE POLA ADRESU
+document.addEventListener("change", (e) => {
+  if (e.target.id === "delivery-option") {
+    const option = e.target.value;
+    const addressField = document.getElementById("address-field");
+    const addressInput = document.getElementById("address");
+
+    if (option === "hotel" || option === "apartment") {
+      addressField.classList.remove("hidden");
+      addressInput.required = true;
+    } else {
+      addressField.classList.add("hidden");
+      addressInput.required = false;
+      addressInput.value = "";
+    }
+  }
+});
+
 // -------------------------------
 // Koszyk trzyma tylko ID produktów
 // -------------------------------
@@ -462,6 +480,7 @@ document.addEventListener("submit", async (e) => {
     const items = cart.map(item => `${item.name} (${item.price} zł/dzień)`).join(", ");
 
     const deliveryOption = document.getElementById("delivery-option").value;
+    const addressValue = document.getElementById("address").value;
 
     const payload = {
       name: document.getElementById("name").value,
@@ -471,7 +490,8 @@ document.addEventListener("submit", async (e) => {
       endDate: end,
       items,
       totalPrice: total.toFixed(2),
-      delivery: deliveryOption
+      delivery: deliveryOption,
+      address: addressValue
     };
 
     await fetch(
