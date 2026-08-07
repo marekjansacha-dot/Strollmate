@@ -397,3 +397,8 @@ section {
     min-width: 100%;
   }
 }
+
+/* ⭐ UKRYWANIE POLA ADRESU */
+.hidden {
+  display: none;
+}
