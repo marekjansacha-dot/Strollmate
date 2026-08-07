@@ -44,89 +44,94 @@
 
           <form id="reservation-form" class="fancy-card" style="text-align:left;">
 
-  <!-- UKRYTE POLE NA KOSZYK -->
-  <input type="hidden" name="cart" id="cart-hidden">
+            <!-- UKRYTE POLE NA KOSZYK -->
+            <input type="hidden" name="cart" id="cart-hidden">
 
-  <h2>Dane kontaktowe</h2>
+            <h2>Dane kontaktowe</h2>
 
-  <label>Imię i nazwisko</label>
-  <input 
-    type="text" 
-    name="name" 
-    id="name"
-    required 
-    style="width:100%; padding:10px; margin-bottom:15px;"
-  >
+            <label>Imię i nazwisko</label>
+            <input 
+              type="text" 
+              name="name" 
+              id="name"
+              required 
+              style="width:100%; padding:10px; margin-bottom:15px;"
+            >
 
-  <label>Telefon</label>
-  <input 
-    type="text" 
-    name="phone" 
-    id="phone"
-    required 
-    style="width:100%; padding:10px; margin-bottom:15px;"
-  >
+            <label>Telefon</label>
+            <input 
+              type="text" 
+              name="phone" 
+              id="phone"
+              required 
+              style="width:100%; padding:10px; margin-bottom:15px;"
+            >
 
-  <label>Email</label>
-  <input 
-    type="email" 
-    name="email" 
-    id="email"
-    required 
-    style="width:100%; padding:10px; margin-bottom:25px;"
-  >
-
-
-  <h2>Termin wypożyczenia</h2>
-
-  <label>Data odbioru</label>
-  <input 
-    type="date" 
-    name="start" 
-    required 
-    style="width:100%; padding:10px; margin-bottom:15px;"
-  >
-
-  <label>Data zwrotu</label>
-  <input 
-    type="date" 
-    name="end" 
-    required 
-    style="width:100%; padding:10px; margin-bottom:25px;"
-  >
+            <label>Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              id="email"
+              required 
+              style="width:100%; padding:10px; margin-bottom:25px;"
+            >
 
 
-  <h2>Sposób dostawy</h2>
+            <h2>Termin wypożyczenia</h2>
 
-  <select 
-    name="delivery" 
-    required 
-    style="width:100%; padding:10px; margin-bottom:25px;"
-  >
-    <option value="odbior">Odbiór osobisty</option>
-    <option value="hotel">Dostawa do hotelu</option>
-    <option value="lotnisko">Dostawa na lotnisko Balice</option>
-    <option value="adres">Dostawa pod wskazany adres</option>
-  </select>
+            <label>Data odbioru</label>
+            <input 
+              type="date" 
+              name="start" 
+              required 
+              style="width:100%; padding:10px; margin-bottom:15px;"
+            >
 
-  <label>Adres (jeśli dotyczy)</label>
-  <input 
-    type="text" 
-    name="address" 
-    placeholder="Ulica, nr, miasto" 
-    style="width:100%; padding:10px; margin-bottom:25px;"
-  >
+            <label>Data zwrotu</label>
+            <input 
+              type="date" 
+              name="end" 
+              required 
+              style="width:100%; padding:10px; margin-bottom:25px;"
+            >
 
-  <button 
-    type="submit" 
-    class="btn-primary" 
-    style="width:100%; padding:14px; font-size:1rem;"
-  >
-    Wyślij rezerwację
-  </button>
 
-</form>
+            <h2>Sposób dostawy</h2>
 
+            <select 
+              id="delivery-option"
+              name="delivery" 
+              required 
+              style="width:100%; padding:10px; margin-bottom:25px;"
+            >
+              <option value="">Wybierz opcję dostawy</option>
+              <option value="pickup">Odbiór osobisty</option>
+              <option value="hotel">Dostawa do hotelu</option>
+              <option value="airport">Dostawa na lotnisko Balice</option>
+              <option value="apartment">Dostawa pod wskazany adres</option>
+            </select>
+
+            <!-- ⭐ POLE ADRESU — UKRYTE NA START -->
+            <div id="address-field" class="hidden">
+              <label>Adres (jeśli dotyczy)</label>
+              <input 
+                type="text" 
+                name="address" 
+                id="address"
+                placeholder="Ulica, nr, miasto" 
+                style="width:100%; padding:10px; margin-bottom:25px;"
+              >
+            </div>
+
+            <button 
+              type="submit" 
+              class="btn-primary" 
+              style="width:100%; padding:14px; font-size:1rem;"
+            >
+              Wyślij rezerwację
+            </button>
+
+          </form>
 
         </div>
 
