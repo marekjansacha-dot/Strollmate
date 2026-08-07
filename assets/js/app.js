@@ -96,7 +96,6 @@ function isAvailable(productId, start, end) {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  // mapowanie dni tygodnia
   const dayNames = {
     0: "Sunday",
     1: "Monday",
@@ -107,55 +106,40 @@ function isAvailable(productId, start, end) {
     6: "Saturday"
   };
 
-  // 1️⃣ BLOKADA: jeśli START wypada w niedzielę
   for (const b of adminBlocks) {
     if (b.type === "weekday_start" && b.weekday) {
       if (b.product === "all" || b.product === productId) {
         const startName = dayNames[startDate.getDay()];
-        if (startName === b.weekday) {
-          return false;
-        }
+        if (startName === b.weekday) return false;
       }
     }
   }
 
-  // 2️⃣ BLOKADA: jeśli KONIEC wypada w niedzielę
   for (const b of adminBlocks) {
     if (b.type === "weekday_end" && b.weekday) {
       if (b.product === "all" || b.product === productId) {
         const endName = dayNames[endDate.getDay()];
-        if (endName === b.weekday) {
-          return false;
-        }
+        if (endName === b.weekday) return false;
       }
     }
   }
 
-  // 3️⃣ BLOKADY ZAKRESÓW DAT Z PANELU ADMINA
   for (const b of adminBlocks) {
     if (b.type === "range" && b.from && b.to) {
       if (b.product === "all" || b.product === productId) {
         const blockStart = new Date(b.from);
         const blockEnd = new Date(b.to);
-
-        if (startDate <= blockEnd && endDate >= blockStart) {
-          return false;
-        }
+        if (startDate <= blockEnd && endDate >= blockStart) return false;
       }
     }
   }
 
-  // 4️⃣ LOKALNE BLOKADY (availability)
   const blocks = availability[productId] || [];
 
   const conflict = blocks.some(block => {
     const blockStart = new Date(block.from);
     const blockEnd = new Date(block.to);
-
-    return (
-      (startDate <= blockEnd) &&
-      (endDate >= blockStart)
-    );
+    return (startDate <= blockEnd) && (endDate >= blockStart);
   });
 
   if (conflict) return false;
@@ -177,7 +161,6 @@ function applyAvailability() {
 
     const available = isAvailable(productId, start, end);
 
-    // Reset overlay przy każdej zmianie dat
     if (img) {
       img.classList.remove("sunday-overlay");
       const oldOverlay = img.querySelector(".sunday-overlay-text");
@@ -193,7 +176,6 @@ function applyAvailability() {
         addBtn.style.pointerEvents = "none";
       }
 
-      // 🔥 LOGIKA OVERLAY NIEDZIELNEGO
       const startDate = start ? new Date(start) : null;
       const endDate = end ? new Date(end) : null;
 
@@ -238,6 +220,66 @@ function applyAvailability() {
     }
   });
 }
+
+// -------------------------------
+// DELIVERY AVAILABILITY — NOWY SYSTEM
+// -------------------------------
+
+let deliveryBlocks = [];
+
+const DELIVERY_URL =
+  "https://script.google.com/macros/s/AKfycbw88MA9RDV25l1uc3gLEjX5zx18-zKdUy9OPFr8O8GWviqCxyLi8I64Oif94HSPC5nj/exec";
+
+async function fetchDeliveryAvailability() {
+  try {
+    const res = await fetch(DELIVERY_URL);
+    const data = await res.json();
+    deliveryBlocks = Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Nie udało się pobrać blokad dostawy:", err);
+    deliveryBlocks = [];
+  }
+}
+
+function isDeliveryAvailable(option, start, end) {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  const weekdayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  for (const b of deliveryBlocks) {
+
+    if (b.delivery_option !== option) continue;
+
+    if (b.type === "closed") return false;
+
+    if (b.type === "weekday_block") {
+      const startDay = weekdayNames[startDate.getDay()];
+      const endDay = weekdayNames[endDate.getDay()];
+      if (startDay === b.weekday || endDay === b.weekday) return false;
+    }
+
+    if (b.type === "range") {
+      const blockStart = new Date(b.from);
+      const blockEnd = new Date(b.to);
+      if (startDate <= blockEnd && endDate >= blockStart) return false;
+    }
+  }
+
+  return true;
+}
+
+document.addEventListener("change", (e) => {
+  if (e.target.id === "delivery-option") {
+    const option = e.target.value;
+    const { start, end } = getDates();
+
+    if (!isDeliveryAvailable(option, start, end)) {
+      alert("Ta opcja dostawy jest niedostępna w wybranym terminie.");
+      e.target.value = "";
+    }
+  }
+});
 
 // -------------------------------
 // Koszyk trzyma tylko ID produktów
@@ -394,11 +436,12 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Inicjalizacja: najpierw pobierz blokady admina, potem zastosuj
+// Inicjalizacja
 (async function init() {
   updateCartTopbar();
   renderCartInForm();
   await fetchAdminAvailability();
+  await fetchDeliveryAvailability();   // ⭐ NOWE
   applyAvailability();
 })();
 
@@ -418,6 +461,8 @@ document.addEventListener("submit", async (e) => {
 
     const items = cart.map(item => `${item.name} (${item.price} zł/dzień)`).join(", ");
 
+    const deliveryOption = document.getElementById("delivery-option").value;
+
     const payload = {
       name: document.getElementById("name").value,
       phone: document.getElementById("phone").value,
@@ -425,7 +470,8 @@ document.addEventListener("submit", async (e) => {
       startDate: start,
       endDate: end,
       items,
-      totalPrice: total.toFixed(2)
+      totalPrice: total.toFixed(2),
+      delivery: deliveryOption
     };
 
     await fetch(
@@ -447,12 +493,12 @@ document.addEventListener("submit", async (e) => {
 });
 
 // -------------------------------
-// ⭐ SLIDER PRODUKTÓW — NOWA FUNKCJA
+// ⭐ SLIDER PRODUKTÓW
 // -------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
   const track = document.querySelector(".slider-track");
-  if (!track) return; // slider tylko na podstronach produktu
+  if (!track) return;
 
   const btnLeft = document.querySelector(".slider-btn-left");
   const btnRight = document.querySelector(".slider-btn-right");
@@ -462,7 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function getCardWidth() {
     const card = track.querySelector(".small-card");
     if (!card) return 300;
-    return card.offsetWidth + 20; // margines między kartami
+    return card.offsetWidth + 20;
   }
 
   btnRight.addEventListener("click", () => {
