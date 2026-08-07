@@ -62,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // DOSTĘPNOŚĆ PRODUKTÓW
 // -------------------------------
 
-// lokalne blokady (na razie puste)
 const availability = {
   wozek1: [],
   wozek2: [],
@@ -72,10 +71,8 @@ const availability = {
   waga1: []
 };
 
-// blokady z panelu admina (Google Sheets)
 let adminBlocks = [];
 
-// 🔥 URL WEB APP Z APPS SCRIPT (availability_admin)
 const ADMIN_AVAILABILITY_URL =
   "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec";
 
@@ -300,6 +297,39 @@ document.addEventListener("change", (e) => {
 });
 
 // -------------------------------
+// ⭐ DYNAMICZNY DROPDOWN DOSTAWY
+// -------------------------------
+
+function renderDeliveryDropdown() {
+  const select = document.getElementById("delivery-option");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Wybierz opcję dostawy</option>`;
+
+  const allOptions = ["pickup", "airport", "hotel", "apartment"];
+
+  const closedOptions = deliveryBlocks
+    .filter(b => b.type === "closed")
+    .map(b => b.delivery_option);
+
+  const labels = {
+    pickup: "Odbiór osobisty",
+    airport: "Dostawa na lotnisko Balice",
+    hotel: "Dostawa do hotelu",
+    apartment: "Dostawa pod wskazany adres"
+  };
+
+  allOptions.forEach(option => {
+    if (closedOptions.includes(option)) return;
+
+    const opt = document.createElement("option");
+    opt.value = option;
+    opt.textContent = labels[option] || option;
+    select.appendChild(opt);
+  });
+}
+
+// -------------------------------
 // Koszyk trzyma tylko ID produktów
 // -------------------------------
 
@@ -459,7 +489,8 @@ document.addEventListener("click", (e) => {
   updateCartTopbar();
   renderCartInForm();
   await fetchAdminAvailability();
-  await fetchDeliveryAvailability();   // ⭐ NOWE
+  await fetchDeliveryAvailability();
+  renderDeliveryDropdown();   // ⭐ NOWE — dynamiczny dropdown
   applyAvailability();
 })();
 
