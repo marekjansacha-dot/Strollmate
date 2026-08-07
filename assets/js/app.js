@@ -269,6 +269,36 @@ function isDeliveryAvailable(option, start, end) {
   return true;
 }
 
+// ⭐ DROPDOWN DOSTAW — OPCJA A (UKRYWANIE CLOSED)
+function renderDeliveryDropdown() {
+  const select = document.getElementById("delivery-option");
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Wybierz opcję dostawy</option>`;
+
+  const allOptions = ["pickup", "airport", "hotel", "apartment"];
+
+  const closedOptions = deliveryBlocks
+    .filter(b => b.type === "closed")
+    .map(b => b.delivery_option);
+
+  const labels = {
+    pickup: "Odbiór osobisty",
+    airport: "Dostawa na lotnisko Balice",
+    hotel: "Dostawa do hotelu",
+    apartment: "Dostawa pod wskazany adres"
+  };
+
+  allOptions.forEach(option => {
+    if (closedOptions.includes(option)) return;
+
+    const opt = document.createElement("option");
+    opt.value = option;
+    opt.textContent = labels[option] || option;
+    select.appendChild(opt);
+  });
+}
+
 document.addEventListener("change", (e) => {
   if (e.target.id === "delivery-option") {
     const option = e.target.value;
@@ -459,7 +489,8 @@ document.addEventListener("click", (e) => {
   updateCartTopbar();
   renderCartInForm();
   await fetchAdminAvailability();
-  await fetchDeliveryAvailability();   // ⭐ NOWE
+  await fetchDeliveryAvailability();
+  renderDeliveryDropdown();   // ⭐ NOWE
   applyAvailability();
 })();
 
@@ -544,3 +575,17 @@ document.addEventListener("DOMContentLoaded", () => {
     track.style.transform = `translateX(-${position}px)`;
   });
 });
+  btnRight.addEventListener("click", () => {
+    const cardWidth = getCardWidth();
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    position = Math.min(position + cardWidth, maxScroll);
+    track.style.transform = `translateX(-${position}px)`;
+  });
+
+  btnLeft.addEventListener("click", () => {
+    const cardWidth = getCardWidth();
+    position = Math.max(position - cardWidth, 0);
+    track.style.transform = `translateX(-${position}px)`;
+  });
+});
+
