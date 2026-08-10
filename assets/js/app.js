@@ -269,22 +269,20 @@ function isDeliveryAvailable(option, start, end) {
   return true;
 }
 
+// ⭐ SCALONY LISTENER — JEDEN OBSŁUGUJE WSZYSTKO
 document.addEventListener("change", (e) => {
   if (e.target.id === "delivery-option") {
     const option = e.target.value;
     const { start, end } = getDates();
 
+    // 🔥 1. Sprawdzenie dostępności dostawy
     if (!isDeliveryAvailable(option, start, end)) {
       alert("Ta opcja dostawy jest niedostępna w wybranym terminie.");
       e.target.value = "";
+      return; // ważne — zatrzymuje dalsze działanie
     }
-  }
-});
 
-// ⭐ POKAZYWANIE / UKRYWANIE POLA ADRESU
-document.addEventListener("change", (e) => {
-  if (e.target.id === "delivery-option") {
-    const option = e.target.value;
+    // 🔥 2. Pokazywanie / ukrywanie pola adresu
     const addressField = document.getElementById("address-field");
     const addressInput = document.getElementById("address");
 
@@ -298,6 +296,7 @@ document.addEventListener("change", (e) => {
     }
   }
 });
+
 
 // -------------------------------
 // Koszyk trzyma tylko ID produktów
