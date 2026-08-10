@@ -493,17 +493,20 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
+    // ⭐ FETCH REZERWACJI — LOGOWANIE
     await fetch(
-      "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec",
+      "https://script.google.com/macros/s/AKfycbz6yY0lp4zNR21_6MQPVkGm-zLAxgo2orDETpQhEMwSjY8Cf4LGSf1tuzvcQUrMv4c/exec",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       }
-    );
+    )
+    .then(r => r.text())
+    .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
+    .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
 
+    // ⭐ FETCH BLOKAD PRODUKTÓW — LOGOWANIE
     for (const item of cart) {
       await fetch(
         "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec",
@@ -517,10 +520,13 @@ document.addEventListener("submit", async (e) => {
             to: end
           })
         }
-      );
+      )
+      .then(r => r.text())
+      .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
+      .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
     }
 
-    // ⭐ NOWY KOMUNIKAT (Opcja C)
+    // ⭐ KOMUNIKAT
     const msg = document.getElementById("reservation-message");
     msg.style.display = "block";
 
@@ -531,6 +537,7 @@ document.addEventListener("submit", async (e) => {
     }, 3000);
   }
 });
+
 
 // -------------------------------
 // ⭐ SLIDER PRODUKTÓW
