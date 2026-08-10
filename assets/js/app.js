@@ -476,7 +476,9 @@ document.addEventListener("submit", async (e) => {
 
     const total = cart.reduce((sum, item) => sum + item.price * days, 0);
 
-    const items = cart.map(item => `${item.name} (${item.price} zł/dzień)`).join(", ");
+    const items = cart
+      .map(item => `${item.name} (${item.price} zł/dzień)`)
+      .join(", ");
 
     const deliveryOption = document.getElementById("delivery-option").value;
     const addressValue = document.getElementById("address").value;
@@ -513,7 +515,7 @@ document.addEventListener("submit", async (e) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            product: item.id,
+            product: item.id,   // np. wozek1, fotelik2
             type: "range",
             from: start,
             to: end
@@ -527,6 +529,7 @@ document.addEventListener("submit", async (e) => {
     window.location.href = "index.html";
   }
 });
+
 
 // -------------------------------
 // ⭐ SLIDER PRODUKTÓW
