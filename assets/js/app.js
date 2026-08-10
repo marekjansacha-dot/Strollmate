@@ -458,7 +458,7 @@ document.addEventListener("click", (e) => {
   updateCartTopbar();
   renderCartInForm();
   await fetchAdminAvailability();
-  await fetchDeliveryAvailability();   // ⭐ NOWE
+  await fetchDeliveryAvailability();
   applyAvailability();
 })();
 
@@ -495,7 +495,6 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
-    // 🔥 Wysyłka rezerwacji do głównego WebAppa — POPRAWIONY URL
     await fetch(
       "https://script.google.com/macros/s/AKfycbwKvA4KIZNnDbwsQS4cZWCx9oSl40iPwZ7l4zYKyuxXgpJn6Fx4wLd_csJpagYeWw/exec",
       {
@@ -507,7 +506,6 @@ document.addEventListener("submit", async (e) => {
       }
     );
 
-    // 🔥 ZAPIS BLOKADY DLA KAŻDEGO PRODUKTU OSOBNO (OPCJA A)
     for (const item of cart) {
       await fetch(
         "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec",
@@ -515,7 +513,7 @@ document.addEventListener("submit", async (e) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            product: item.id,   // np. wozek1, fotelik2
+            product: item.id,
             type: "range",
             from: start,
             to: end
@@ -524,12 +522,17 @@ document.addEventListener("submit", async (e) => {
       );
     }
 
-    alert("Rezerwacja wysłana! Skontaktujemy się wkrótce.");
+    // ⭐ NOWY KOMUNIKAT (Opcja C)
+    const msg = document.getElementById("reservation-message");
+    msg.style.display = "block";
+
     localStorage.removeItem("cart");
-    window.location.href = "index.html";
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 3000);
   }
 });
-
 
 // -------------------------------
 // ⭐ SLIDER PRODUKTÓW
