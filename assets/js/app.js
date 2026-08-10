@@ -493,12 +493,11 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
-    // 🔥 Wysyłka rezerwacji do głównego WebAppa
+    // 🔥 Wysyłka rezerwacji do głównego WebAppa — POPRAWIONY URL
     await fetch(
-      "https://script.google.com/macros/s/AKfycbxxpCDCDQqwQHRnXqdxDV8h-bVHbCSrsddqfqAhip57b37UvNPtK2QxTgKwKwAP9iQ/exec",
+      "https://script.google.com/macros/s/AKfycbwKvA4KIZNnDbwsQS4cZWCx9oSl40iPwZ7l4zYKyuxXgpJn6Fx4wLd_csJpagYeWw/exec",
       {
         method: "POST",
-        mode: "no-cors",
         headers: {
           "Content-Type": "application/json"
         },
@@ -514,7 +513,7 @@ document.addEventListener("submit", async (e) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            product: item.id,   // np. wozek1, fotelik2
+            product: item.id,
             type: "range",
             from: start,
             to: end
@@ -561,3 +560,4 @@ document.addEventListener("DOMContentLoaded", () => {
     track.style.transform = `translateX(-${position}px)`;
   });
 });
+
