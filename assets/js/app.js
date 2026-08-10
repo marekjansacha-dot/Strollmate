@@ -494,6 +494,7 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
+    // 🔥 Wysyłka rezerwacji do głównego WebAppa
     await fetch(
       "https://script.google.com/macros/s/AKfycbxxpCDCDQqwQHRnXqdxDV8h-bVHbCSrsddqfqAhip57b37UvNPtK2QxTgKwKwAP9iQ/exec",
       {
@@ -505,6 +506,23 @@ document.addEventListener("submit", async (e) => {
         body: JSON.stringify(payload)
       }
     );
+
+    // 🔥 ZAPIS BLOKADY DLA KAŻDEGO PRODUKTU OSOBNO (OPCJA A)
+    for (const item of cart) {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product: item.id,   // np. wozek1, fotelik2
+            type: "range",
+            from: start,
+            to: end
+          })
+        }
+      );
+    }
 
     alert("Rezerwacja wysłana! Skontaktujemy się wkrótce.");
     localStorage.removeItem("cart");
