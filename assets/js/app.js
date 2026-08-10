@@ -77,7 +77,7 @@ let adminBlocks = [];
 
 // 🔥 URL WEB APP Z APPS SCRIPT (availability_admin)
 const ADMIN_AVAILABILITY_URL =
-  "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec";
+  "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec";
 
 async function fetchAdminAvailability() {
   try {
@@ -228,7 +228,7 @@ function applyAvailability() {
 let deliveryBlocks = [];
 
 const DELIVERY_URL =
-  "https://script.google.com/macros/s/AKfycbw88MA9RDV25l1uc3gLEjX5zx18-zKdUy9OPFr8O8GWviqCxyLi8I64Oif94HSPC5nj/exec";
+  "https://script.google.com/macros/s/AKfycbxrZ5uyI8eGYISZwccFdu0W-PvaGvHZ8CYy2lc7lZep_VFYEHAP021pET2f7G_sRMKw/exec";
 
 async function fetchDeliveryAvailability() {
   try {
@@ -494,7 +494,7 @@ document.addEventListener("submit", async (e) => {
     };
 
     await fetch(
-      "https://script.google.com/macros/s/AKfycbwKvA4KIZNnDbwsQS4cZWCx9oSl40iPwZ7l4zYKyuxXgpJn6Fx4wLd_csJpagYeWw/exec",
+      "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec",
       {
         method: "POST",
         headers: {
@@ -506,7 +506,7 @@ document.addEventListener("submit", async (e) => {
 
     for (const item of cart) {
       await fetch(
-        "https://script.google.com/macros/s/AKfycbxIu0zR-s6ItV-y8Fbx2Ywwsusvjqn5hX7EyFLXtn4s8jySd0SwRZ-RB4oF2Nq4Vlag/exec",
+        "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
