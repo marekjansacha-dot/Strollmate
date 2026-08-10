@@ -296,8 +296,6 @@ document.addEventListener("change", (e) => {
     }
   }
 });
-
-
 // -------------------------------
 // Koszyk trzyma tylko ID produktów
 // -------------------------------
