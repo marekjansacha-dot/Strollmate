@@ -480,6 +480,13 @@ document.addEventListener("submit", async (e) => {
 
     const deliveryOption = document.getElementById("delivery-option").value;
     const addressValue = document.getElementById("address").value;
+    
+    // 🔥 Wymuszenie wyboru opcji dostawy
+    if (!deliveryOption) {
+      alert("Wybierz opcję dostawy przed złożeniem rezerwacji.");
+      return;
+    }
+
 
     const payload = {
       name: document.getElementById("name").value,
@@ -495,7 +502,7 @@ document.addEventListener("submit", async (e) => {
 
     // ⭐ FETCH REZERWACJI — LOGOWANIE
     await fetch(
-      "https://script.google.com/macros/s/AKfycbz6yY0lp4zNR21_6MQPVkGm-zLAxgo2orDETpQhEMwSjY8Cf4LGSf1tuzvcQUrMv4c/exec",
+      "https://script.google.com/macros/s/AKfycbz83boBU36IrPzvwqYnPFlaj2tJR7KrufQ57f74uYAyzZAvs9nMhSh_ewPrSfXnRbQ/exec",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
