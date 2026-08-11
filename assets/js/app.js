@@ -500,18 +500,21 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
-    // ⭐ FETCH REZERWACJI — LOGOWANIE
-    await fetch(
-      "https://script.google.com/macros/s/AKfycbz83boBU36IrPzvwqYnPFlaj2tJR7KrufQ57f74uYAyzZAvs9nMhSh_ewPrSfXnRbQ/exec",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }
-    )
-    .then(r => r.text())
-    .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
-    .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
+   // ⭐ FETCH REZERWACJI — LOGOWANIE
+await fetch(
+  "https://script.google.com/macros/s/AKfycbz83boBU36IrPzvwqYnPFlaj2tJR7KrufQ57f74uYAyzZAvs9nMhSh_ewPrSfXnRbQ/exec",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  }
+)
+.then(r => r.text())
+.then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
+.catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
+
 
     // ⭐ FETCH BLOKAD PRODUKTÓW — LOGOWANIE
     for (const item of cart) {
