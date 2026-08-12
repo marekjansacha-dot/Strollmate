@@ -501,7 +501,9 @@ document.addEventListener("submit", async (e) => {
     };
 
    // ⭐ FETCH REZERWACJI — LOGOWANIE
-await fetch(
+console.log("FETCH START");
+
+    await fetch(
   "https://script.google.com/macros/s/AKfycbxsT0QrjvM8vYBB4Cy7gzqjkS8TnAcBr3awxjphRTRf-Vleb5AJXKgjUHB9bFdC_oY/exec",
   {
     method: "POST",
