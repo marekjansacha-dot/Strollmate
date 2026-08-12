@@ -510,7 +510,7 @@ const qs = new URLSearchParams(payload).toString();
 
 // wysyłka GET zamiast POST
 await fetch(
-  "https://script.google.com/macros/s/AKfycbwTG0Byn73CyP-KpHOZ0q2d6y12P8I9mIJPHcm-i7Qk11BUrb9RVIFdR4j_GULei0E/exec" + qs
+  "https://script.google.com/macros/s/AKfycbwTG0Byn73CyP-KpHOZ0q2d6y12P8I9mIJPHcm-i7Qk11BUrb9RVIFdR4j_GULei0E/exec?" + qs
 )
 
   .then(r => r.text())
