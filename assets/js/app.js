@@ -510,7 +510,7 @@ const qs = new URLSearchParams(payload).toString();
 
 // wysyłka GET zamiast POST
 await fetch(
-  "https://script.google.com/macros/s/AKfycbxsT0QrjvM8vYBB4Cy7gzqjkS8TnAcBr3awxjphRTRf-Vleb5AJXKgjUHB9bFdC_oY/exec?" + qs
+  "https://script.google.com/macros/s/AKfycby5yR92D21OpYURyrDbszZ__6j9TUkEzFoJw25EcghDKrSX0PLsVhQthxZxN3ri26s/exec?" + qs
 )
   .then(r => r.text())
   .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
