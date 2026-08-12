@@ -77,7 +77,7 @@ let adminBlocks = [];
 
 // 🔥 URL WEB APP Z APPS SCRIPT (availability_admin)
 const ADMIN_AVAILABILITY_URL =
-  "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec";
+  "https://script.google.com/macros/s/AKfycbxHBaXnh0OXprIVPdcOzLEa90dIJdNt_EfTq9DrPKQ9DoHgbg8zfWXqPs76Orfbqo1Q/exec";
 
 async function fetchAdminAvailability() {
   try {
@@ -230,9 +230,10 @@ let deliveryBlocks = [];
 const DELIVERY_URL =
   "https://script.google.com/macros/s/AKfycbxrZ5uyI8eGYISZwccFdu0W-PvaGvHZ8CYy2lc7lZep_VFYEHAP021pET2f7G_sRMKw/exec";
 
+// ⭐ FETCH DELIVERY — GET (bez CORS)
 async function fetchDeliveryAvailability() {
   try {
-    const res = await fetch(DELIVERY_URL);
+    const res = await fetch(DELIVERY_URL); // GET — działa na GitHub Pages
     const data = await res.json();
     deliveryBlocks = Array.isArray(data) ? data : [];
   } catch (err) {
@@ -279,7 +280,7 @@ document.addEventListener("change", (e) => {
     if (!isDeliveryAvailable(option, start, end)) {
       alert("Ta opcja dostawy jest niedostępna w wybranym terminie.");
       e.target.value = "";
-      return; // ważne — zatrzymuje dalsze działanie
+      return;
     }
 
     // 🔥 2. Pokazywanie / ukrywanie pola adresu
@@ -296,6 +297,7 @@ document.addEventListener("change", (e) => {
     }
   }
 });
+
 // -------------------------------
 // Koszyk trzyma tylko ID produktów
 // -------------------------------
@@ -516,24 +518,26 @@ await fetch(
 
 
     // ⭐ FETCH BLOKAD PRODUKTÓW — LOGOWANIE
-    for (const item of cart) {
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            product: item.id,
-            type: "range",
-            from: start,
-            to: end
-          })
-        }
-      )
-      .then(r => r.text())
-      .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
-      .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
-    }
+for (const item of cart) {
+
+  // przygotowanie danych do URL
+  const payloadBlock = {
+    product: item.id,
+    type: "range",
+    from: start,
+    to: end
+  };
+
+  const qsBlock = new URLSearchParams(payloadBlock).toString();
+
+  // wysyłka GET zamiast POST — działa na GitHub Pages
+  await fetch(
+    "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec?" + qsBlock
+  )
+    .then(r => r.text())
+    .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
+    .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
+}
 
     // ⭐ KOMUNIKAT
     const msg = document.getElementById("reservation-message");
