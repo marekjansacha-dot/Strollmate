@@ -503,19 +503,16 @@ document.addEventListener("submit", async (e) => {
    // ⭐ FETCH REZERWACJI — LOGOWANIE
 console.log("FETCH START");
 
-    await fetch(
-  "https://script.google.com/macros/s/AKfycbxsT0QrjvM8vYBB4Cy7gzqjkS8TnAcBr3awxjphRTRf-Vleb5AJXKgjUHB9bFdC_oY/exec",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json;charset=utf-8"
-    },
-    body: JSON.stringify(payload)
-  }
+// zamiana payload → query string
+const qs = new URLSearchParams(payload).toString();
+
+// wysyłka GET zamiast POST
+await fetch(
+  "https://script.google.com/macros/s/AKfycbxsT0QrjvM8vYBB4Cy7gzqjkS8TnAcBr3awxjphRTRf-Vleb5AJXKgjUHB9bFdC_oY/exec?" + qs
 )
-.then(r => r.text())
-.then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
-.catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
+  .then(r => r.text())
+  .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
+  .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
 
 
     // ⭐ FETCH BLOKAD PRODUKTÓW — LOGOWANIE
