@@ -502,7 +502,7 @@ document.addEventListener("submit", async (e) => {
 
    // ⭐ FETCH REZERWACJI — LOGOWANIE
 await fetch(
-  "https://script.google.com/macros/s/AKfycbyxgIGPZ7wXz8cgKUBKOKflIbzywoaLD6qCR-vDjEzD28kRZ028odBN5uoba5DxeaA/exec",
+  "https://script.google.com/macros/s/AKfycbxsT0QrjvM8vYBB4Cy7gzqjkS8TnAcBr3awxjphRTRf-Vleb5AJXKgjUHB9bFdC_oY/exec",
   {
     method: "POST",
     headers: {
