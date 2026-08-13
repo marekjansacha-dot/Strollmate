@@ -242,23 +242,35 @@ async function fetchDeliveryAvailability() {
   }
 }
 
-// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU
+// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU — OPCJA A
 function applyDeliveryVisibility() {
   const select = document.getElementById("delivery-option");
   if (!select) return;
 
-  const { start, end } = getDates();
-
   [...select.options].forEach(opt => {
     if (!opt.value) return; // pomiń placeholder
 
-    const available = isDeliveryAvailable(opt.value, start, end);
+    // 🔥 1. Jeśli opcja jest całkowicie wyłączona (closed) → ukryj natychmiast
+    const isClosed = deliveryBlocks.some(b =>
+      b.delivery_option === opt.value && b.type === "closed"
+    );
 
-    if (!available) {
+    if (isClosed) {
       opt.style.display = "none";
-    } else {
-      opt.style.display = "block";
+      return;
     }
+
+    // 🔥 2. Jeśli opcja ma blokady zależne od dat → sprawdzaj tylko gdy daty są wybrane
+    const { start, end } = getDates();
+    if (!start || !end) {
+      // brak dat → nie ukrywamy niczego poza closed
+      opt.style.display = "block";
+      return;
+    }
+
+    // 🔥 3. Normalne sprawdzanie dostępności (weekday_block, range)
+    const available = isDeliveryAvailable(opt.value, start, end);
+    opt.style.display = available ? "block" : "none";
   });
 }
 
@@ -272,6 +284,7 @@ function isDeliveryAvailable(option, start, end) {
 
     if (b.delivery_option !== option) continue;
 
+    // 🔥 closed → zawsze niedostępne
     if (b.type === "closed") return false;
 
     if (b.type === "weekday_block") {
@@ -289,6 +302,7 @@ function isDeliveryAvailable(option, start, end) {
 
   return true;
 }
+
 
 // ⭐ SCALONY LISTENER — JEDEN OBSŁUGUJE WSZYSTKO
 document.addEventListener("change", (e) => {
