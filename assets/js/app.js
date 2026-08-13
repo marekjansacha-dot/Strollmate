@@ -228,7 +228,7 @@ function applyAvailability() {
 let deliveryBlocks = [];
 
 const DELIVERY_URL =
-  "https://script.google.com/macros/s/AKfycbxrZ5uyI8eGYISZwccFdu0W-PvaGvHZ8CYy2lc7lZep_VFYEHAP021pET2f7G_sRMKw/exec";
+  "https://script.google.com/macros/s/AKfycbwYhc0s5RPDrKCUj_QizeMYlUcstU4CymGMG-8CO1vBdc5Ue-5uvP0qMEKDR_HJQEML/exec";
 
 // ⭐ FETCH DELIVERY — GET (bez CORS)
 async function fetchDeliveryAvailability() {
