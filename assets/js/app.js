@@ -233,13 +233,33 @@ const DELIVERY_URL =
 // ⭐ FETCH DELIVERY — GET (bez CORS)
 async function fetchDeliveryAvailability() {
   try {
-    const res = await fetch(DELIVERY_URL); // GET — działa na GitHub Pages
+    const res = await fetch(DELIVERY_URL);
     const data = await res.json();
     deliveryBlocks = Array.isArray(data) ? data : [];
   } catch (err) {
     console.error("Nie udało się pobrać blokad dostawy:", err);
     deliveryBlocks = [];
   }
+}
+
+// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU
+function applyDeliveryVisibility() {
+  const select = document.getElementById("delivery-option");
+  if (!select) return;
+
+  const { start, end } = getDates();
+
+  [...select.options].forEach(opt => {
+    if (!opt.value) return; // pomiń placeholder
+
+    const available = isDeliveryAvailable(opt.value, start, end);
+
+    if (!available) {
+      opt.style.display = "none";
+    } else {
+      opt.style.display = "block";
+    }
+  });
 }
 
 function isDeliveryAvailable(option, start, end) {
@@ -276,14 +296,12 @@ document.addEventListener("change", (e) => {
     const option = e.target.value;
     const { start, end } = getDates();
 
-    // 🔥 1. Sprawdzenie dostępności dostawy
     if (!isDeliveryAvailable(option, start, end)) {
       alert("Ta opcja dostawy jest niedostępna w wybranym terminie.");
       e.target.value = "";
       return;
     }
 
-    // 🔥 2. Pokazywanie / ukrywanie pola adresu
     const addressField = document.getElementById("address-field");
     const addressInput = document.getElementById("address");
 
@@ -295,6 +313,11 @@ document.addEventListener("change", (e) => {
       addressInput.required = false;
       addressInput.value = "";
     }
+  }
+
+  // 🔥 aktualizacja widoczności dostaw przy zmianie dat
+  if (e.target.name === "start" || e.target.name === "end") {
+    applyDeliveryVisibility();
   }
 });
 
@@ -312,7 +335,6 @@ function saveCart(cart) {
   renderCartInForm();
 }
 
-// Dodawanie bez duplikatów
 function addToCart(id, name, price) {
   const cart = getCart();
 
@@ -327,20 +349,17 @@ function addToCart(id, name, price) {
   alert("Dodano do koszyka!");
 }
 
-// Usuwanie
 function removeFromCart(id) {
   const cart = getCart().filter(item => item.id !== id);
   saveCart(cart);
 }
 
-// Liczenie dni
 function countDays(start, end) {
   const s = new Date(start);
   const e = new Date(end);
   return Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
 }
 
-// Suma w topbarze
 function updateCartTopbar() {
   const cart = getCart();
   const { start, end } = getDates();
@@ -360,7 +379,6 @@ function updateCartTopbar() {
   el.textContent = `${total.toFixed(2)} zł (${count})`;
 }
 
-// Render koszyka w formularzu
 function renderCartInForm() {
   const container = document.getElementById("cart-items");
   const totalEl = document.getElementById("cart-total-summary");
@@ -431,7 +449,6 @@ function renderCartInForm() {
   totalEl.textContent = `${total.toFixed(2)} zł`;
 }
 
-// Obsługa kliknięć
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("add-to-cart")) {
     const { start, end } = getDates();
@@ -453,13 +470,17 @@ document.addEventListener("click", (e) => {
   }
 });
 
+// -------------------------------
 // Inicjalizacja
+// -------------------------------
+
 (async function init() {
   updateCartTopbar();
   renderCartInForm();
   await fetchAdminAvailability();
   await fetchDeliveryAvailability();
   applyAvailability();
+  applyDeliveryVisibility(); // 🔥 NOWE — ukrywanie opcji dostawy
 })();
 
 // -------------------------------
@@ -483,12 +504,10 @@ document.addEventListener("submit", async (e) => {
     const deliveryOption = document.getElementById("delivery-option").value;
     const addressValue = document.getElementById("address").value;
     
-    // 🔥 Wymuszenie wyboru opcji dostawy
     if (!deliveryOption) {
       alert("Wybierz opcję dostawy przed złożeniem rezerwacji.");
       return;
     }
-
 
     const payload = {
       name: document.getElementById("name").value,
@@ -502,45 +521,35 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
-   // ⭐ FETCH REZERWACJI — LOGOWANIE
-console.log("FETCH START");
+    console.log("FETCH START");
 
-// zamiana payload → query string
-const qs = new URLSearchParams(payload).toString();
+    const qs = new URLSearchParams(payload).toString();
 
-// wysyłka GET zamiast POST
-await fetch(
-  "https://script.google.com/macros/s/AKfycbwTG0Byn73CyP-KpHOZ0q2d6y12P8I9mIJPHcm-i7Qk11BUrb9RVIFdR4j_GULei0E/exec?" + qs
-)
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbwTG0Byn73CyP-KpHOZ0q2d6y12P8I9mIJPHcm-i7Qk11BUrb9RVIFdR4j_GULei0E/exec?" + qs
+    )
+      .then(r => r.text())
+      .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
+      .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
 
-  .then(r => r.text())
-  .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
-  .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
+    for (const item of cart) {
+      const payloadBlock = {
+        product: item.id,
+        type: "range",
+        from: start,
+        to: end
+      };
 
+      const qsBlock = new URLSearchParams(payloadBlock).toString();
 
-    // ⭐ FETCH BLOKAD PRODUKTÓW — LOGOWANIE
-for (const item of cart) {
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec?" + qsBlock
+      )
+        .then(r => r.text())
+        .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
+        .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
+    }
 
-  // przygotowanie danych do URL
-  const payloadBlock = {
-    product: item.id,
-    type: "range",
-    from: start,
-    to: end
-  };
-
-  const qsBlock = new URLSearchParams(payloadBlock).toString();
-
-  // wysyłka GET zamiast POST — działa na GitHub Pages
-  await fetch(
-    "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec?" + qsBlock
-  )
-    .then(r => r.text())
-    .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
-    .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
-}
-
-    // ⭐ KOMUNIKAT
     const msg = document.getElementById("reservation-message");
     msg.style.display = "block";
 
@@ -551,7 +560,6 @@ for (const item of cart) {
     }, 3000);
   }
 });
-
 
 // -------------------------------
 // ⭐ SLIDER PRODUKTÓW
@@ -585,4 +593,5 @@ document.addEventListener("DOMContentLoaded", () => {
     track.style.transform = `translateX(-${position}px)`;
   });
 });
+
 
