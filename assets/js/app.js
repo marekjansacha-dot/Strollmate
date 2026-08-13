@@ -234,11 +234,8 @@ const DELIVERY_URL =
 async function fetchDeliveryAvailability() {
   try {
     const res = await fetch(DELIVERY_URL);
-    const text = await res.text();
-    console.log("RAW RESPONSE:", text);   // 🔥 najważniejsze
-    const data = JSON.parse(text);
+    const data = await res.json();
     deliveryBlocks = Array.isArray(data) ? data : [];
-    console.log("deliveryBlocks:", deliveryBlocks); // 🔥 drugi najważniejszy
   } catch (err) {
     console.error("Nie udało się pobrać blokad dostawy:", err);
     deliveryBlocks = [];
