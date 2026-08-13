@@ -493,8 +493,8 @@ document.addEventListener("click", (e) => {
   renderCartInForm();
   await fetchAdminAvailability();
   await fetchDeliveryAvailability();
+  applyDeliveryVisibility();   // 🔥 NOWE — ukrywanie opcji dostawy
   applyAvailability();
-  applyDeliveryVisibility(); // 🔥 NOWE — ukrywanie opcji dostawy
 })();
 
 // -------------------------------
