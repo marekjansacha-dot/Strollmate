@@ -1,17 +1,33 @@
 // -------------------------------
-// TERMINY W LOCALSTORAGE
+// TERMINY W LOCALSTORAGE — z walidacją dat
 // -------------------------------
 
 document.addEventListener("click", (e) => {
   if (e.target.id === "apply-dates") {
+
     const start = document.getElementById("date-start").value;
     const end = document.getElementById("date-end").value;
 
+    // ⭐ Walidacja pustych dat
     if (!start || !end) {
-      alert("Wybierz obie daty.");
+      alert("Wybierz datę odbioru i zwrotu.");
       return;
     }
 
+    // ⭐ Walidacja: zwrot nie może być wcześniejszy niż odbiór
+    if (new Date(end) < new Date(start)) {
+      alert("Data zwrotu nie może być wcześniejsza niż data odbioru.");
+      return;
+    }
+
+    // ⭐ Walidacja: daty nie mogą być z przeszłości
+    const today = new Date().toISOString().split("T")[0];
+    if (start < today || end < today) {
+      alert("Daty nie mogą być wcześniejsze niż dzisiejsza.");
+      return;
+    }
+
+    // ⭐ Jeśli wszystko OK → zapisujemy
     localStorage.setItem("startDate", start);
     localStorage.setItem("endDate", end);
 
@@ -23,8 +39,8 @@ document.addEventListener("click", (e) => {
 // Pobranie terminu
 function getDates() {
   return {
-    start: localStorage.getItem("startDate"),
-    end: localStorage.getItem("endDate")
+    start: localStorage.getItem("startDate") || "",
+    end: localStorage.getItem("endDate") || ""
   };
 }
 
@@ -44,15 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------
-// AUTO-WYPEŁNIANIE DAT W FORMULARZU REZERWACJI — POPRAWIONE
+// AUTO-WYPEŁNIANIE DAT W FORMULARZU REZERWACJI
 // -------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
   const start = localStorage.getItem("startDate");
   const end = localStorage.getItem("endDate");
 
-  const startInput = document.querySelector("input[name='startDate']");
-  const endInput = document.querySelector("input[name='endDate']");
+  const startInput = document.querySelector("input[name='start']");
+  const endInput = document.querySelector("input[name='end']");
 
   if (start && startInput) startInput.value = start;
   if (end && endInput) endInput.value = end;
@@ -330,10 +346,10 @@ document.addEventListener("change", (e) => {
     }
   }
 
-  // 🔥 aktualizacja widoczności dostaw przy zmianie dat — POPRAWIONE
-if (e.target.name === "startDate" || e.target.name === "endDate") {
-  applyDeliveryVisibility();
-}
+  // 🔥 aktualizacja widoczności dostaw przy zmianie dat
+  if (e.target.name === "start" || e.target.name === "end") {
+    applyDeliveryVisibility();
+  }
 });
 
 // -------------------------------
@@ -499,27 +515,43 @@ document.addEventListener("click", (e) => {
 })();
 
 // -------------------------------
-// WYSYŁKA REZERWACJI — NOWY SYSTEM
+// WYSYŁKA REZERWACJI — WERSJA GET
 // -------------------------------
 
 document.addEventListener("submit", async (e) => {
   if (e.target.id === "reservation-form") {
     e.preventDefault();
 
-    const { start, end } = getDates();
+    // ⭐ Pobieramy daty z formularza
+    const startForm = document.querySelector("input[name='start']").value;
+    const endForm = document.querySelector("input[name='end']").value;
+
+    // ⭐ Jeśli formularz pusty → używamy dat z localStorage
+    const { start: lsStart, end: lsEnd } = getDates();
+
+    const start = startForm || lsStart;
+    const end = endForm || lsEnd;
+
     const cart = getCart();
+    const days = countDays(start, end);
 
-    if (!start || !end) {
-      alert("Wybierz termin wypożyczenia.");
-      return;
-    }
-
+    // ⭐ WALIDACJA PUSTEGO KOSZYKA
     if (cart.length === 0) {
       alert("Koszyk jest pusty.");
       return;
     }
 
-    const days = countDays(start, end);
+    // ⭐ WALIDACJA DAT
+    if (!start || !end) {
+      alert("Wybierz datę odbioru i zwrotu.");
+      return;
+    }
+
+    if (new Date(end) < new Date(start)) {
+      alert("Data zwrotu nie może być wcześniejsza niż data odbioru.");
+      return;
+    }
+
     const total = cart.reduce((sum, item) => sum + item.price * days, 0);
 
     const items = cart
@@ -528,13 +560,13 @@ document.addEventListener("submit", async (e) => {
 
     const deliveryOption = document.getElementById("delivery-option").value;
     const addressValue = document.getElementById("address").value;
-
+    
     if (!deliveryOption) {
-      alert("Wybierz opcję dostawy.");
+      alert("Wybierz opcję dostawy przed złożeniem rezerwacji.");
       return;
     }
 
-    // 🔥 payload do Google Sheets (Rezerwacje Wypożyczalnia)
+    // ⭐ Payload do GET
     const payload = {
       name: document.getElementById("name").value,
       phone: document.getElementById("phone").value,
@@ -547,17 +579,19 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
+    console.log("FETCH GET START");
+
+    // ⭐ ZAMIANA POST → GET
     const qs = new URLSearchParams(payload).toString();
 
-    // 🔥 wysyłka rezerwacji do arkusza
     await fetch(
-      "https://script.google.com/macros/s/AKfycbxVnzJWXiJjygUXi807Q5L6vzo6vm1pnuv-F2eqOcJv0rbObOPAdUgvbAui7WBMeKrC/exec?" + qs
+      "https://script.google.com/macros/s/AKfycbzn8a6ZzMxK-Br0ytUI9CxSSKYUCLjn8WX1FkN3qU_bw_o1NqrIFSL3j3z2HcA8rXY/exec?" + qs
     )
       .then(r => r.text())
-      .then(t => console.log("REZERWACJA OK:", t))
-      .catch(err => console.error("BŁĄD REZERWACJI:", err));
+      .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
+      .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
 
-    // 🔥 wysyłka blokad produktów (range)
+    // ⭐ BLOKADY PRODUKTÓW — GET (bez zmian)
     for (const item of cart) {
       const payloadBlock = {
         product: item.id,
@@ -572,11 +606,10 @@ document.addEventListener("submit", async (e) => {
         "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec?" + qsBlock
       )
         .then(r => r.text())
-        .then(t => console.log("BLOKADA OK:", t))
-        .catch(err => console.error("BŁĄD BLOKADY:", err));
+        .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
+        .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
     }
 
-    // 🔥 komunikat + reset koszyka
     const msg = document.getElementById("reservation-message");
     msg.style.display = "block";
 
@@ -587,6 +620,8 @@ document.addEventListener("submit", async (e) => {
     }, 3000);
   }
 });
+
+
 
 
 // -------------------------------
@@ -621,5 +656,4 @@ document.addEventListener("DOMContentLoaded", () => {
     track.style.transform = `translateX(-${position}px)`;
   });
 });
-
 
