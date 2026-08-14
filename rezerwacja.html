@@ -45,7 +45,8 @@
           <form id="reservation-form" class="fancy-card" style="text-align:left;">
 
             <!-- UKRYTE POLE NA KOSZYK -->
-            <input type="hidden" name="cart" id="cart-hidden">
+            <input type="hidden" name="items" id="cart-hidden">
+            <input type="hidden" name="totalPrice" id="cart-total-hidden">
 
             <h2>Dane kontaktowe</h2>
 
@@ -82,7 +83,7 @@
             <label>Data odbioru</label>
             <input 
               type="date" 
-              name="start" 
+              name="startDate" 
               required 
               style="width:100%; padding:10px; margin-bottom:15px;"
             >
@@ -90,7 +91,7 @@
             <label>Data zwrotu</label>
             <input 
               type="date" 
-              name="end" 
+              name="endDate" 
               required 
               style="width:100%; padding:10px; margin-bottom:25px;"
             >
@@ -108,7 +109,7 @@
               <option value="pickup">Odbiór osobisty</option>
               <option value="hotel">Dostawa do hotelu</option>
               <option value="airport">Dostawa na lotnisko Balice</option>
-              <option value="apartment">Dostawa pod wskazany adres</option>
+              <option value="address">Dostawa pod wskazany adres</option>
             </select>
 
             <!-- ⭐ POLE ADRESU — UKRYTE NA START -->
