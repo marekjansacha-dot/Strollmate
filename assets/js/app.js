@@ -499,7 +499,7 @@ document.addEventListener("click", (e) => {
 })();
 
 // -------------------------------
-// WYSYŁKA REZERWACJI
+// WYSYŁKA REZERWACJI — NOWY SYSTEM
 // -------------------------------
 
 document.addEventListener("submit", async (e) => {
@@ -508,8 +508,18 @@ document.addEventListener("submit", async (e) => {
 
     const { start, end } = getDates();
     const cart = getCart();
-    const days = countDays(start, end);
 
+    if (!start || !end) {
+      alert("Wybierz termin wypożyczenia.");
+      return;
+    }
+
+    if (cart.length === 0) {
+      alert("Koszyk jest pusty.");
+      return;
+    }
+
+    const days = countDays(start, end);
     const total = cart.reduce((sum, item) => sum + item.price * days, 0);
 
     const items = cart
@@ -518,12 +528,13 @@ document.addEventListener("submit", async (e) => {
 
     const deliveryOption = document.getElementById("delivery-option").value;
     const addressValue = document.getElementById("address").value;
-    
+
     if (!deliveryOption) {
-      alert("Wybierz opcję dostawy przed złożeniem rezerwacji.");
+      alert("Wybierz opcję dostawy.");
       return;
     }
 
+    // 🔥 payload do Google Sheets (Rezerwacje Wypożyczalnia)
     const payload = {
       name: document.getElementById("name").value,
       phone: document.getElementById("phone").value,
@@ -536,17 +547,17 @@ document.addEventListener("submit", async (e) => {
       address: addressValue
     };
 
-    console.log("FETCH START");
-
     const qs = new URLSearchParams(payload).toString();
 
+    // 🔥 wysyłka rezerwacji do arkusza
     await fetch(
-      "https://script.google.com/macros/s/AKfycbxVnzJWXiJjygUXi807Q5L6vzo6vm1pnuv-F2eqOcJv0rbObOPAdUgvbAui7WBMeKrC/exec" + qs
+      "https://script.google.com/macros/s/AKfycbxVnzJWXiJjygUXi807Q5L6vzo6vm1pnuv-F2eqOcJv0rbObOPAdUgvbAui7WBMeKrC/exec?" + qs
     )
       .then(r => r.text())
-      .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
-      .catch(err => console.error("BŁĄD FETCH REZERWACJA:", err));
+      .then(t => console.log("REZERWACJA OK:", t))
+      .catch(err => console.error("BŁĄD REZERWACJI:", err));
 
+    // 🔥 wysyłka blokad produktów (range)
     for (const item of cart) {
       const payloadBlock = {
         product: item.id,
@@ -561,10 +572,11 @@ document.addEventListener("submit", async (e) => {
         "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec?" + qsBlock
       )
         .then(r => r.text())
-        .then(t => console.log("BLOKADA ODPOWIEDŹ:", t))
-        .catch(err => console.error("BŁĄD FETCH BLOKADA:", err));
+        .then(t => console.log("BLOKADA OK:", t))
+        .catch(err => console.error("BŁĄD BLOKADY:", err));
     }
 
+    // 🔥 komunikat + reset koszyka
     const msg = document.getElementById("reservation-message");
     msg.style.display = "block";
 
@@ -575,6 +587,7 @@ document.addEventListener("submit", async (e) => {
     }, 3000);
   }
 });
+
 
 // -------------------------------
 // ⭐ SLIDER PRODUKTÓW
