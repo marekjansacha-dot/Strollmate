@@ -44,15 +44,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -------------------------------
-// AUTO-WYPEŁNIANIE DAT W FORMULARZU REZERWACJI
+// AUTO-WYPEŁNIANIE DAT W FORMULARZU REZERWACJI — POPRAWIONE
 // -------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
   const start = localStorage.getItem("startDate");
   const end = localStorage.getItem("endDate");
 
-  const startInput = document.querySelector("input[name='start']");
-  const endInput = document.querySelector("input[name='end']");
+  const startInput = document.querySelector("input[name='startDate']");
+  const endInput = document.querySelector("input[name='endDate']");
 
   if (start && startInput) startInput.value = start;
   if (end && endInput) endInput.value = end;
@@ -330,10 +330,10 @@ document.addEventListener("change", (e) => {
     }
   }
 
-  // 🔥 aktualizacja widoczności dostaw przy zmianie dat
-  if (e.target.name === "start" || e.target.name === "end") {
-    applyDeliveryVisibility();
-  }
+  // 🔥 aktualizacja widoczności dostaw przy zmianie dat — POPRAWIONE
+if (e.target.name === "startDate" || e.target.name === "endDate") {
+  applyDeliveryVisibility();
+}
 });
 
 // -------------------------------
