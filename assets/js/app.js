@@ -585,7 +585,7 @@ document.addEventListener("submit", async (e) => {
     const qs = new URLSearchParams(payload).toString();
 
     await fetch(
-      "https://script.google.com/macros/s/AKfycbzn8a6ZzMxK-Br0ytUI9CxSSKYUCLjn8WX1FkN3qU_bw_o1NqrIFSL3j3z2HcA8rXY/exec?" + qs
+      "https://script.google.com/macros/s/AKfycbz9hh9-0FN-QJBDl7zsx2VgtRiBcO28uSZI_pQPe-tFD2SBuHz9qfz-TeggtK3KEnc/exec?" + qs
     )
       .then(r => r.text())
       .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
