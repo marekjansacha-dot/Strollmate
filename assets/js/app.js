@@ -244,7 +244,7 @@ function applyAvailability() {
 let deliveryBlocks = [];
 
 const DELIVERY_URL =
-  "https://script.google.com/macros/s/AKfycbx6TITh5EmrFy4BLMOALkn2JS-d8PptJVyMwO_mp47zMGwiD97Y7QqrD7EQ_dXmS427/exec";
+  "https://script.google.com/macros/s/AKfycbwnzM8p8Ak35tQFhMRogUR--cfG7g39TFXzYaLal-UYxCls0oVE0jh7cl9mvEeW4hQ2/exec";
 
 // ⭐ FETCH DELIVERY — GET
 async function fetchDeliveryAvailability() {
