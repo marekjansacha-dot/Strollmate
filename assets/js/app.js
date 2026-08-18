@@ -238,20 +238,21 @@ function applyAvailability() {
 }
 
 // -------------------------------
-// DELIVERY AVAILABILITY — NOWY SYSTEM
+// DELIVERY AVAILABILITY — NOWY SYSTEM (FINALNA WERSJA)
 // -------------------------------
 
 let deliveryBlocks = [];
 
 const DELIVERY_URL =
-  "https://script.google.com/macros/s/AKfycbwYhc0s5RPDrKCUj_QizeMYlUcstU4CymGMG-8CO1vBdc5Ue-5uvP0qMEKDR_HJQEML/exec";
+  "https://script.google.com/macros/s/AKfycbx6TITh5EmrFy4BLMOALkn2JS-d8PptJVyMwO_mp47zMGwiD97Y7QqrD7EQ_dXmS427/exec";
 
-// ⭐ FETCH DELIVERY — GET (bez CORS)
+// ⭐ FETCH DELIVERY — GET
 async function fetchDeliveryAvailability() {
   try {
     const res = await fetch(DELIVERY_URL);
     const data = await res.json();
     deliveryBlocks = Array.isArray(data) ? data : [];
+    console.log("DELIVERY BLOCKS:", deliveryBlocks);
   } catch (err) {
     console.error("Nie udało się pobrać blokad dostawy:", err);
     deliveryBlocks = [];
@@ -259,17 +260,20 @@ async function fetchDeliveryAvailability() {
 }
 
 
-// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU — OPCJA A
+// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU
 function applyDeliveryVisibility() {
   const select = document.getElementById("delivery-option");
   if (!select) return;
 
+  const { start, end } = getDates();
+
   [...select.options].forEach(opt => {
     if (!opt.value) return; // pomiń placeholder
 
-    // 🔥 1. Jeśli opcja jest całkowicie wyłączona (closed) → ukryj natychmiast
+    // 🔥 CLOSED działa dla konkretnej opcji ORAZ dla "all"
     const isClosed = deliveryBlocks.some(b =>
-      b.delivery_option === opt.value && b.type === "closed"
+      (b.delivery_option === opt.value || b.delivery_option === "all") &&
+      b.type === "closed"
     );
 
     if (isClosed) {
@@ -277,20 +281,20 @@ function applyDeliveryVisibility() {
       return;
     }
 
-    // 🔥 2. Jeśli opcja ma blokady zależne od dat → sprawdzaj tylko gdy daty są wybrane
-    const { start, end } = getDates();
+    // 🔥 brak dat → nie sprawdzamy weekday_block / range
     if (!start || !end) {
-      // brak dat → nie ukrywamy niczego poza closed
       opt.style.display = "block";
       return;
     }
 
-    // 🔥 3. Normalne sprawdzanie dostępności (weekday_block, range)
+    // 🔥 normalne sprawdzanie dostępności
     const available = isDeliveryAvailable(opt.value, start, end);
     opt.style.display = available ? "block" : "none";
   });
 }
 
+
+// ⭐ SPRAWDZANIE DOSTĘPNOŚCI OPCJI DOSTAWY
 function isDeliveryAvailable(option, start, end) {
   const startDate = new Date(start);
   const endDate = new Date(end);
@@ -299,21 +303,31 @@ function isDeliveryAvailable(option, start, end) {
 
   for (const b of deliveryBlocks) {
 
-    if (b.delivery_option !== option) continue;
+    // 🔥 obsługa "all" — blokada dla wszystkich opcji
+    if (b.delivery_option !== option && b.delivery_option !== "all") continue;
 
     // 🔥 closed → zawsze niedostępne
     if (b.type === "closed") return false;
 
+    // 🔥 weekday_block
     if (b.type === "weekday_block") {
       const startDay = weekdayNames[startDate.getDay()];
       const endDay = weekdayNames[endDate.getDay()];
+
+      // "all" = blokuj niezależnie od dnia
+      if (b.weekday === "all") return false;
+
       if (startDay === b.weekday || endDay === b.weekday) return false;
     }
 
-    if (b.type === "range") {
+    // 🔥 range
+    if (b.type === "range" && b.from && b.to) {
       const blockStart = new Date(b.from);
       const blockEnd = new Date(b.to);
-      if (startDate <= blockEnd && endDate >= blockStart) return false;
+
+      if (startDate <= blockEnd && endDate >= blockStart) {
+        return false;
+      }
     }
   }
 
@@ -321,13 +335,13 @@ function isDeliveryAvailable(option, start, end) {
 }
 
 
-// ⭐ SCALONY LISTENER — JEDEN OBSŁUGUJE WSZYSTKO
+// ⭐ SCALONY LISTENER — DOSTAWA + adres
 document.addEventListener("change", (e) => {
   if (e.target.id === "delivery-option") {
     const option = e.target.value;
     const { start, end } = getDates();
 
-    if (!isDeliveryAvailable(option, start, end)) {
+    if (option && !isDeliveryAvailable(option, start, end)) {
       alert("Ta opcja dostawy jest niedostępna w wybranym terminie.");
       e.target.value = "";
       return;
