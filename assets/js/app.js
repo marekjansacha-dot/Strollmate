@@ -93,7 +93,7 @@ let adminBlocks = [];
 
 // 🔥 URL WEB APP Z APPS SCRIPT (availability_admin)
 const ADMIN_AVAILABILITY_URL =
-  "https://script.google.com/macros/s/AKfycbxHBaXnh0OXprIVPdcOzLEa90dIJdNt_EfTq9DrPKQ9DoHgbg8zfWXqPs76Orfbqo1Q/exec";
+  "https://script.google.com/macros/s/AKfycbxUND67AAzsUIyfRS5gwmXDHeINdHZNvjoiOCsqZrW8I-s7EqkA6a7Z3uVLrQyF7PEW/exec";
 
 async function fetchAdminAvailability() {
   try {
@@ -238,42 +238,40 @@ function applyAvailability() {
 }
 
 // -------------------------------
-// DELIVERY AVAILABILITY — NOWY SYSTEM (FINALNA WERSJA)
+// DELIVERY AVAILABILITY — JSONP (zgodne z Apps Script)
 // -------------------------------
 
 let deliveryBlocks = [];
 
 const DELIVERY_URL =
-  "https://script.google.com/macros/s/AKfycbwnzM8p8Ak35tQFhMRogUR--cfG7g39TFXzYaLal-UYxCls0oVE0jh7cl9mvEeW4hQ2/exec";
+  "https://script.google.com/macros/s/AKfycbyhhhZVw42qonOLqNEHF5LNfJB-ePFTVh_Qz1uyYxGVBQSRZj7kzSxOLJIQFDaQH0XI/exec";
 
-// ⭐ FETCH DELIVERY — GET
-async function fetchDeliveryAvailability() {
-  try {
-    const res = await fetch(DELIVERY_URL);
-    const data = await res.json();
-    deliveryBlocks = Array.isArray(data) ? data : [];
-    console.log("DELIVERY BLOCKS:", deliveryBlocks);
-  } catch (err) {
-    console.error("Nie udało się pobrać blokad dostawy:", err);
-    deliveryBlocks = [];
-  }
+// callback z Apps Script JSONP
+function deliveryCallback(data) {
+  deliveryBlocks = Array.isArray(data) ? data : [];
+  console.log("DELIVERY BLOCKS:", deliveryBlocks);
+  applyDeliveryVisibility();   // 🔥 dopiero teraz mamy dane, więc aktualizujemy select
+}
+
+// JSONP loader — zamiast fetch()
+function loadDeliveryAvailability() {
+  const script = document.createElement("script");
+  script.src = DELIVERY_URL + "?callback=deliveryCallback";
+  document.body.appendChild(script);
 }
 
 
-// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU
+// ⭐ UKRYWANIE OPCJI DOSTAWY W FORMULARZU — OPCJA A
 function applyDeliveryVisibility() {
   const select = document.getElementById("delivery-option");
   if (!select) return;
 
-  const { start, end } = getDates();
-
   [...select.options].forEach(opt => {
     if (!opt.value) return; // pomiń placeholder
 
-    // 🔥 CLOSED działa dla konkretnej opcji ORAZ dla "all"
+    // 🔥 1. Jeśli opcja jest całkowicie wyłączona (closed) → ukryj natychmiast
     const isClosed = deliveryBlocks.some(b =>
-      (b.delivery_option === opt.value || b.delivery_option === "all") &&
-      b.type === "closed"
+      b.delivery_option === opt.value && b.type === "closed"
     );
 
     if (isClosed) {
@@ -281,20 +279,20 @@ function applyDeliveryVisibility() {
       return;
     }
 
-    // 🔥 brak dat → nie sprawdzamy weekday_block / range
+    // 🔥 2. Jeśli opcja ma blokady zależne od dat → sprawdzaj tylko gdy daty są wybrane
+    const { start, end } = getDates();
     if (!start || !end) {
+      // brak dat → nie ukrywamy niczego poza closed
       opt.style.display = "block";
       return;
     }
 
-    // 🔥 normalne sprawdzanie dostępności
+    // 🔥 3. Normalne sprawdzanie dostępności (weekday_block, range)
     const available = isDeliveryAvailable(opt.value, start, end);
     opt.style.display = available ? "block" : "none";
   });
 }
 
-
-// ⭐ SPRAWDZANIE DOSTĘPNOŚCI OPCJI DOSTAWY
 function isDeliveryAvailable(option, start, end) {
   const startDate = new Date(start);
   const endDate = new Date(end);
@@ -303,31 +301,21 @@ function isDeliveryAvailable(option, start, end) {
 
   for (const b of deliveryBlocks) {
 
-    // 🔥 obsługa "all" — blokada dla wszystkich opcji
-    if (b.delivery_option !== option && b.delivery_option !== "all") continue;
+    if (b.delivery_option !== option) continue;
 
     // 🔥 closed → zawsze niedostępne
     if (b.type === "closed") return false;
 
-    // 🔥 weekday_block
     if (b.type === "weekday_block") {
       const startDay = weekdayNames[startDate.getDay()];
       const endDay = weekdayNames[endDate.getDay()];
-
-      // "all" = blokuj niezależnie od dnia
-      if (b.weekday === "all") return false;
-
       if (startDay === b.weekday || endDay === b.weekday) return false;
     }
 
-    // 🔥 range
-    if (b.type === "range" && b.from && b.to) {
+    if (b.type === "range") {
       const blockStart = new Date(b.from);
       const blockEnd = new Date(b.to);
-
-      if (startDate <= blockEnd && endDate >= blockStart) {
-        return false;
-      }
+      if (startDate <= blockEnd && endDate >= blockStart) return false;
     }
   }
 
@@ -335,13 +323,13 @@ function isDeliveryAvailable(option, start, end) {
 }
 
 
-// ⭐ SCALONY LISTENER — DOSTAWA + adres
+// ⭐ SCALONY LISTENER — JEDEN OBSŁUGUJE WSZYSTKO
 document.addEventListener("change", (e) => {
   if (e.target.id === "delivery-option") {
     const option = e.target.value;
     const { start, end } = getDates();
 
-    if (option && !isDeliveryAvailable(option, start, end)) {
+    if (!isDeliveryAvailable(option, start, end)) {
       alert("Ta opcja dostawy jest niedostępna w wybranym terminie.");
       e.target.value = "";
       return;
@@ -522,11 +510,13 @@ document.addEventListener("click", (e) => {
 (async function init() {
   updateCartTopbar();
   renderCartInForm();
-  await fetchAdminAvailability();
-  await fetchDeliveryAvailability();
-  applyDeliveryVisibility();   // 🔥 NOWE — ukrywanie opcji dostawy
+
+  await fetchAdminAvailability();   // availability admin = JSON
+  loadDeliveryAvailability();       // delivery admin = JSONP
+
   applyAvailability();
 })();
+
 
 // -------------------------------
 // WYSYŁKA REZERWACJI — WERSJA GET
@@ -599,7 +589,7 @@ document.addEventListener("submit", async (e) => {
     const qs = new URLSearchParams(payload).toString();
 
     await fetch(
-      "https://script.google.com/macros/s/AKfycbz9hh9-0FN-QJBDl7zsx2VgtRiBcO28uSZI_pQPe-tFD2SBuHz9qfz-TeggtK3KEnc/exec?" + qs
+      "https://script.google.com/macros/s/AKfycbwzEQRZjfprwKvvBTkOcAv3S3-J6yKxAcp6PWFr3sBrzAM2zDsqoHt85umhF2f2nzE/exec?" + qs
     )
       .then(r => r.text())
       .then(t => console.log("REZERWACJA ODPOWIEDŹ:", t))
